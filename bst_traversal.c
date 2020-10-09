@@ -7,10 +7,13 @@ typedef struct BST {
    struct BST *lchild, *rchild;
 } node;
 
+// declaration of function prototype
 void insert(node *, node *);
 void inorder(node *);
 void preorder(node *);
 void postorder(node *);
+struct node * minValueNode(struct node* node);
+struct node* deleteNode(struct node* root, int key);
 node *search(node *, int, node **);
 
 void main() {
@@ -28,6 +31,7 @@ void main() {
       printf("\n2.Search");
       printf("\n3.Recursive Traversals");
       printf("\n4.Exit");
+      printf("\n5.deletion");
       printf("\nEnter your choice :");
       scanf("%d", &choice);
 
@@ -68,6 +72,11 @@ void main() {
             postorder(root);
          }
          break;
+         case 5:
+            printf("\nEnter The Element ");
+            scanf("%d", &new_node->data);
+            root=deleteNode(root,new_node->data);
+            inorder(root);
       }
    } while (choice != 4);
 }
@@ -133,6 +142,39 @@ void inorder(node *temp) {
 /*
  This function displays the tree in preorder fashion
  */
+
+//  This function is for deletion
+struct node * minValueNode(struct node* node){
+   struct node* current = node;
+   while (current && current->left != NULL)
+      current = current->left;
+   return current;
+}
+struct node* deleteNode(struct node* root, int key){
+   if (root == NULL) return root;
+      if (key < root->data)
+         root->left = deleteNode(root->left, key);
+      else if (key > root->data)
+         root->right = deleteNode(root->right, key);
+   else{
+      if (root->left == NULL){
+         struct node *temp = root->right;
+         free(root);
+         return temp;
+      }
+      else if (root->right == NULL){
+         struct node *temp = root->left;
+         free(root);
+         return temp;
+      }
+      struct node* temp = minValueNode(root->right);
+      root->data = temp->data;
+      root->right = deleteNode(root->right, temp->data);
+   }
+   return root;
+}
+// end
+
 void preorder(node *temp) {
    if (temp != NULL) {
       printf("%d", temp->data);
