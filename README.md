@@ -1,3 +1,3 @@
 # Data-Structures-
 
-all data structures using c++ 
+This repository contains AVL tree , Binary Search Tree , Stack data structure implemented in C.
