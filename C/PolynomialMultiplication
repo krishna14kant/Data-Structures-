@@ -1,0 +1,108 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct node
+{
+        int co;
+        int ex1;
+        struct node *next;
+}*s1=NULL,*s2=NULL,*s3=NULL;
+struct node *create(struct node *start)
+{
+        int choice=1;
+        struct node *new,*t=NULL;
+        while(choice)
+        {
+                new=(struct node *)malloc(sizeof(struct node *));
+                printf("\nEnter coefficient\n");
+                scanf("%d",&new->co);
+                printf("Enter exponent of x\n");
+                scanf("%d",&new->ex1);
+                new->next=NULL;
+                if(start==NULL)
+                {
+                       start=new;
+                       t=new; 
+                }
+                else
+                {
+                        t->next=new;
+                        t=t->next;
+                }
+                printf("Continue?(NO=0)");
+                scanf("%d",&choice);
+        }
+        return start;
+}
+void multiply()
+{
+        struct node *p=s1,*q=s2,*new,*t;
+        for(p=s1;p!=NULL;p=p->next)
+        {
+                for(q=s2;q!=NULL;q=q->next)
+                {
+                        new=(struct node *)malloc(sizeof(struct node *));
+                        new->co=p->co*q->co;
+                        new->ex1=p->ex1+q->ex1;
+                        new->next=NULL;
+                        if(s3==NULL)
+                        {
+                               s3=new;
+                               t=new; 
+                        }
+                        else
+                        {
+                                t->next=new;
+                                t=t->next;
+                        }
+                        }
+                
+        }
+}
+void display(struct node *t)
+{
+        while(t!=NULL)
+        {
+                printf("  %dx%d ",t->co,t->ex1);
+                t=t->next;
+                if(t!=NULL)
+                        printf("+");
+        }
+}
+void reduce()
+{
+        struct node *p1,*p2,*prev;
+        for(p1=s3;p1->next!=NULL;p1=p1->next)
+        {
+                prev=p1;
+                for(p2=p1->next;p2!=NULL;p2=p2->next)
+                {
+                        if(p1->ex1==p2->ex1)
+                        {
+                                p1->co=p1->co+p2->co;
+                                prev->next=p2->next;
+                                free(p2);
+                                p2=prev;
+                        }
+                        else
+                                prev=prev->next;
+                }
+                if(prev->next==NULL)
+                        break;
+        }
+}
+int main()
+{
+        printf("Enter polynomial 1\n");
+        s1=create(s1);
+        printf("Enter polynomial 2\n");
+        s2=create(s2);
+        printf("Polynomial 1:\n");
+        display(s1);
+        printf("\nPolynomial 2:\n");
+        display(s2);
+        multiply();
+        reduce();
+        printf("\nResultant polynomial:\n");
+        display(s3);
+        return 0;
+}
