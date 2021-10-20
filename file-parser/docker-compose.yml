@@ -1,0 +1,27 @@
+version: "3.7"
+services:
+  file-parser:
+    build: ./
+    image: file-parser
+    container_name: file-parser
+    restart: on-failure
+    volumes:
+      # - C:\\uploads:/home/node/app/uploads #Windows
+      - /home/fmerino/file-parser/uploads:/home/node/app/uploads #Linux
+    # ports:
+    #   - "3000"
+    # expose:
+    #   - "3000:3000"
+    # env_file: .env
+    # environment:
+    #   - UPLOADS_PATH=$UPLOADS_PATH
+    #   - ORION_IP=$ORION_IP
+    #   - ORION_PORT=$ORION_PORT
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:3000"]
+    #   interval: 1m30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
+
+

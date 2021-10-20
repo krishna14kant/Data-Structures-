@@ -1,0 +1,19 @@
+{
+  "name": "file-parser",
+  "version": "1.0.0",
+  "description": "A file parser to send POST requests to Orion Context Broker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run clean && docker-compose up -d",
+    "clean": "(docker stop file-parser || echo \"El contenedor file-parser no está ejecutándose\") && (docker container rm file-parser || echo \"El contenedor file-parser no existe\") && (docker image rm file-parser || echo \"La imagen file-parser no existe\")"
+  },
+  "author": "Fernando Merino",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "chokidar": "^3.3.1",
+    "console-stamp": "^0.2.9",
+    "dotenv": "^8.2.0"
+  }
+}
