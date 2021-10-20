@@ -1,0 +1,49 @@
+// link to problem 
+//https://codeforces.com/contest/1593/problem/A
+// solution
+#include<iostream>
+#include<algorithm>
+#include<vector>
+using namespace std;
+int main(){
+    long long int test;
+    cin>>test;
+    while(test--){
+        vector<long long int>arr;
+        long long int x;
+        for(int i=0;i<3;i++){
+            cin>>x;
+            arr.push_back(x);
+        }
+        long long int n= arr.size();
+        if((arr[0]==arr[1]) && (arr[1]==arr[2])){
+            cout<<"1 1 1"<<endl;
+            continue;
+        }
+        vector<long long int>t= arr;
+        sort(arr.begin(),arr.end());
+        long long int max=arr[2];
+        if(arr[1]==arr[2]){
+            for(int i=0;i<3;i++){
+            if(t[i]==max){
+                cout<<"1 ";
+            }
+            else {
+                cout<<(max-t[i]+1)<<" ";
+            }
+           }
+        cout<<endl;
+        continue;
+        }
+        for(int i=0;i<3;i++){
+            if(t[i]==max){
+                cout<<"0 ";
+            }
+            else {
+                cout<<(max-t[i]+1)<<" ";
+            }
+        }
+        cout<<endl;
+    }
+    return 0;
+}

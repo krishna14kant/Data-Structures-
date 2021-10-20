@@ -1,62 +1,86 @@
-#include <iostream>
+
+
+
+
+
+
+
  
-using namespace std;
+
  
-void heapify(int arr[], int n, int i)
+
+
+
+#include <bits/stdc++.h>
+
+
+void buildHeap(int[], int);
+void heapify(int[], int, int);
+void swap(int *, int *);
+void print(int[], int n);
+
+void buildHeap(int a[], int n)
 {
-    int largest = i; // Initialize largest as root
-    int l = 2 * i + 1; // left = 2*i + 1
-    int r = 2 * i + 2; // right = 2*i + 2
-
-    if (l < n && arr[l] > arr[largest])
-        largest = l;
- 
-
-    if (r < n && arr[r] > arr[largest])
-        largest = r;
- 
-    
-    if (largest != i) {
-        swap(arr[i], arr[largest]);
- 
-        
-        heapify(arr, n, largest);
-    }
-}
- 
-
-void heapSort(int arr[], int n)
-{
-    
     for (int i = n / 2 - 1; i >= 0; i--)
-        heapify(arr, n, i);
- 
-    
-    for (int i = n - 1; i > 0; i--) {
-        // Move current root to end
-        swap(arr[0], arr[i]);
- 
-        p
-        heapify(arr, i, 0);
+        heapify(a, i, n);
+    cout << "Heap is : ";
+    print(a, n);
+}
+
+void heapify(int a[], int i, int n)
+{
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+
+    if (l < n && a[l] > a[largest])
+        largest = l;
+
+    if (r < n && a[r] > a[largest])
+        largest = r;
+
+    if (largest != i)
+    {
+        swap(a[i], a[largest]);
+        heapify(a, largest, n);
     }
 }
- 
 
-void printArray(int arr[], int n)
+void heapsort(int a[], int n)
 {
-    for (int i = 0; i < n; ++i)
-        cout << arr[i] << " ";
+    for (int i = n - 1; i >= 0; i--)
+    {
+        swap(a[0], a[i]);   
+        heapify(a, 0, i);
+    }
+}
+
+void print(int a[], int n)
+{
+    for (int i = 0; i < n; i++)
+        cout << a[i] << " ";
     cout << "\n";
 }
- 
+
+void swap(int *a, int *b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
 
 int main()
 {
-    int arr[] = { 12, 11, 13, 5, 6, 7 };
-    int n = sizeof(arr) / sizeof(arr[0]);
- 
-    heapSort(arr, n);
- 
-    cout << "Sorted array is \n";
-    printArray(arr, n);
+    int a[] = {20, 10, 15, 7, 26, 11};
+    int n = sizeof(a) / sizeof(a[0]);
+
+    //Build Max Heap
+    buildHeap(a, n);
+
+    //Heap sort
+    heapsort(a, n);
+    cout << "Sorted array is : ";
+    print(a, n);
+    return 0;
+
 }

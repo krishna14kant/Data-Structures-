@@ -1,0 +1,655 @@
+<!doctype HTML>
+<html>
+<title>console.log() adventure</title>
+<script>
+/**********************************************************************************************************************************************************
+/*********   
+/*********
+/*********      A console.log() adventure game.
+/*********
+/*********
+/*********
+/*********      DO NOT READ THE SOURCE CODE UNTIL YOU'VE PLAYED THE GAME!!!!
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********      Just hit F12, to bring up the Console.
+/*********
+/*********
+/*********
+/*********
+/*********      That's where the game is played.
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********      SERIOUSLY!!! Don't read the code, just play the game! F12 (Developer tools)... look at the console!
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********      SERIOUSLY!!! F12 (Dev tools), view "Console". Enter commands like 'n();' for north etc. 
+/*********      It's not hard. You'll figure it out.
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/*********
+/**********************************************************************************************************************************************************
+*/
+(function(exports) { /*** IIFE start **********************************************************************************************/
+  'use strict';
+  
+function start() {
+  console.log("\
+******************************************\r\n\
+*** Hi! Glad you made it down here.       \r\n\
+*** Welcome to a console.log() adventure. \r\n\
+******************************************\r\n\
+ ");
+  console.error("Remember: View source is cheating.");
+  var info = "Type [Help] for help at any time (commands are provided between [], so don't type the brackets).";
+  if (localStorage[localStorageKey]) info += "\r\nThere is a saved game to be played."
+  console.info(info);
+  init();
+  say();
+  c(speakTellings());
+}
+
+/*const*/var localStorageKey = "console-log-data";
+var cmdHistory = [];
+var tellbuf = [];
+var movecount = 0, playerState;
+var playerInventory = {};
+var here = [9,5]; //x,y
+var mapnum = 0;
+var amulet=true;
+var gold=true;
+var busy=false;
+
+function init() {
+  cmdHistory = [];
+  tellbuf = [];
+  movecount = 0;
+  mapnum = 0; // we start on the first map.
+  here = [9,5]; //x,y. Our starting position.
+  playerInventory = { gold : 0, holding:null, food: 10}; //
+  amulet = true; //this sits on the forest floor.
+  gold = true; //inside the cave.
+  busy=false;
+  playerState = { 'health' : 100, 'strength' : 100, 'wisdom' : 0, 'points': 0, 'hunger':0};
+}
+function save() {
+  localStorage[localStorageKey] = JSON.stringify(cmdHistory);
+}
+function runcmd(cmd) {
+  if (!/save|load|remove/i.test(cmd)) {
+    console.log("run> [%s]", cmd);
+    c(exports[cmd]);
+  }
+}
+function load() {
+  var cmds = JSON.parse(localStorage[localStorageKey] || "null");
+  if (!cmds) return false;
+
+  console.groupCollapsed("Loading game...");
+  init();
+  cmds.forEach(runcmd);
+  console.groupEnd();
+  return true;
+}
+function timedLoad(timeout, cmds) {
+  init();
+  busy = 'loading';
+  timedForEach(cmds, timeout, function(cmd) {
+    if (busy == 'won') return true;
+    if (busy == 'loading' || busy === false) {
+      busy = false;
+      runcmd(cmd);
+      if (busy === false) {
+        busy = 'loading';
+        return true;
+      }
+    }
+  }, function() {
+    busy = false;
+  });
+  tell("Loading game...");
+  return;
+}
+function timedForEach(array, timeout, fnEach, fnFinal) {
+  var index = 0, intervalId = setInterval(function() {
+    if (Array.isArray(array) && index < array.length) {
+      if (fnEach(array[index])) //only advance array, when it's OK
+        index++;
+    }
+    else {
+      fnFinal();
+      clearInterval(intervalId);
+    }
+  }, timeout);
+}
+function remove() {
+  if (localStorage[localStorageKey]) {
+    delete localStorage[localStorageKey];
+    return true;
+  }
+  return false;
+}
+
+function tell(text) {
+  tellbuf.push(text);
+}
+function speakTellings() {
+  var tellings = '\t'+tellbuf.join('\r\n\t');
+  tellbuf = [];
+  return tellings;
+
+}
+// Synonyms for our verbs...
+function RegisterCommands(fnCommand, synonyms, hasSetter/*no load/save support for setter*/) {
+  var evaluate = function(cmd, args) {
+    if (busy) {
+      if (busy=='won') {
+        if (!/help|reset/i.test(cmd)) return "You've already won, type [reset] to play again.";
+      }
+      else if (busy=='dead') return "You're dead. Please wait before you will be reincarnated.";
+      else return "I'm busy, please wait patiently...";
+    }
+    cmdHistory.push(cmd);
+    fnCommand.apply(this, args);
+    return speakTellings();
+  }
+  synonyms.split(',').forEach(function(cmd) {
+    if (cmd in exports)
+      console.error("%cCommand %s is already defined", "font-size:150%;color:red;font-weight:bold", cmd, fnCommand);
+    else {
+      var obj = { get:function() { //HEY! No peaking!
+        return evaluate(cmd, arguments)
+      }};
+      if (hasSetter) obj.set = function() {
+        c(evaluate(cmd, arguments));
+      };
+      Object.defineProperty(exports, cmd, obj);
+    }
+  }); 
+}
+RegisterCommands(North,    'North,north,N,n');
+RegisterCommands(South,    'South,south,S,s');
+RegisterCommands(West,     'West,west,W,w');
+RegisterCommands(East,     'East,east,E,e');
+RegisterCommands(Enter,    'Enter,enter,Ent,ent');
+RegisterCommands(Look,     'Look,look,L,l');
+RegisterCommands(Take,     'Take,take,T,t');
+RegisterCommands(Use,      'Use,use,U,u');
+RegisterCommands(Speak,    'Speak,speak,Sp,sp,SP');
+RegisterCommands(Inventory,'Inventory,inventory,Inv,inv,I,i');
+RegisterCommands(Me,       'Me,me,M,m');
+RegisterCommands(Fight,    'Fight,fight,F,f');
+RegisterCommands(Up,       'Up,up');
+RegisterCommands(Eat,      'Eat,eat,EAT');
+RegisterCommands(Help,     'Help,help,HELP,H,h', true);
+RegisterCommands(Reset,    'Reset,reset');
+RegisterCommands(Save,     'Save,save');
+RegisterCommands(Load,     'Load,load', true);
+RegisterCommands(Remove,   'Remove,remove');
+
+// VERBS!!!
+function Help(value) {
+  tell('General commands are (without the []): [n], [s], [e], [w] for [North], [South], [East], [West].');
+  tell('Also: [l] for [Look], [t] for [Take], [u] for [Use], [sp] for [Speak], [Eat], [i] for [Inventory],');
+  tell('[Me] for player state, [f] for [Fight] and [h] for [Help]. You can also [Reset], [Save]');
+  tell('and [Load] or [Remove] a game. For *special* cheats, press Ctrl-F4/Cmd-W.');
+  if (value)
+    tell("The super special secret cheats are [Load = 2000] for the demo or [Load = -2000] for full demo");
+  else
+    tell("For secrets, try redefine help somehow.");
+}
+
+function Eat() {
+  if (playerState.hunger <= 0) {
+    return tell("You are not hungry.");
+  }
+  if (playerInventory.food <= 0) {
+    return tell("You have no food.");
+  }
+  
+  playerInventory.food -= 1;
+  playerState.hunger -= 1;  
+  tell("You eat a little food.");
+}
+
+function Look() {  
+  say();
+  var cell = maps[mapnum][here[1]][here[0]];
+  //c(cell);
+  switch(cell) {
+    
+	case "H" : return tell("The house is weathered, and appears abandoned. The front door is partially off its hinges."),tell("You could easily [Enter].");
+	case "V" : return tell("Cool air blows from the cave. The entrance is large enough that you can [Enter]. You can move " + Possibilities());
+	case "2" : return tell("There is a rope you can climb [Up]. It looks sturdy enough to hold your weight.");	
+    case "k" : return tell("This kitchen contains one of those fancy Magic Amulet Receptacle Devices."),tell("You could try to [Use] it, I guess.");	
+    case "r" : 
+    {
+      act(1000, 
+      [ "The room contains a bath, a sink, and a toilet that runs continuously."
+      , "There is a small window above the toilet. You step up onto the toilet seat,"
+      , "to get a better view through the window. Yes, you can see the outside world,"
+      , "and also... suddenly you fall through the window, landing on the ground outside."
+      , "You walk around the house until you find the front door."
+      , function() {
+          here = [11,5];
+          mapnum = 0;
+          say();
+          return speakTellings();
+        } 
+      ]);
+    }
+    default : return tell("You see nothing else.");
+  }
+}
+function Take(){
+  var cell = maps[mapnum][here[1]][here[0]];
+  //c(cell);
+  switch(cell) {
+    case "E" : {
+       if (amulet == true) {
+         amulet = false;
+         playerInventory.amulet = 1;
+         return tell("You pick up the amulet.");
+        }
+    }
+    case "3" : {
+       if (gold == true) {
+         gold = false;
+         playerInventory.gold = 100;
+         return tell("You take every last piece of gold.");
+       }
+    }
+    default: tell("There is nothing to take.");
+  }
+}
+function Use(x) {
+  var cell = maps[mapnum][here[1]][here[0]];
+  //c(cell);
+  switch(cell) {
+    case "k" : {
+        if (playerInventory.amulet == 1) {
+          win(0);
+          //init();
+          return tell("click.");
+        } else {
+          return tell("It's not clear how to use this Magic Amulet Receptacle Device. Perhaps it requires a magic amulet. But where would we get one of those?");
+        }
+    }
+    default: tell("You can't use that here.");
+  }  
+}
+function Save() {
+  save();
+  tell("You gameplay has been saved.");
+}
+function Load(value) {
+  if (value) {
+    var timeout = +value || 2000;
+    if (timeout > 0) timedLoad(timeout, 'n,n,e,e,e,e,e,t,w,w,w,w,w,s,s,e,e,ent,w,w,w,n,l,u'.split(','));
+    else timedLoad(-timeout, 'eat,w,w,sp,e,e,s,s,l,ent,w,w,n,t,inv,s,e,e,n,l,up,n,n,n,n,w,w,w,w,w,n,w,w,s,s,f,n,n,e,e,n,e,e,e,e,e,e,e,s,e,e,s,t,inv,s,w,w,n,w,w,w,s,s,e,e,l,ent,w,n,l,ent,w,w,w,s,n,w,e,n,l,me,use'.split(','));
+    return;
+  }
+  return load() ? say() : tell("You never seem to have saved your gameplay, Mister!");
+}
+function Remove() {
+  return tell(remove() ? "The saved game has been deleted." : "You never seem to have saved your gameplay, Mister!");
+}
+function Reset() {
+  console.clear();
+  document.body.style.background = "#FFF";
+  document.body.innerHTML ="";
+  init();
+  say();
+}
+function win(n) {
+  busy = 'won';
+  switch(n) {
+    case 0 : c("\tYou take out the amulet and place it in the Magic Amulet Receptacle Device."); break;
+    case 1 : c("\tIt begins to hum."); break;
+    case 2 : c("\tSparks!"); break;
+    case 3 : c("\tA bolt of lightning!"); break;
+    case 4 : c("\tMagic energy lifts you from the floor..."); break;
+    case 5 : c("\tSuddenly, everything goes dark."); break;
+    case 6 : console.log('%c\t Oh my heavens! You look up and see a new world.', 'background: #222; color: #bada55'); break;
+    case 7 : console.log('%c\t You realize at once that everything you have experienced is a mere shadow of the true world.', 'background: #222; color: #bada55'); break;
+    case 8 : console.log('%c\t You\'ve labored in a phantom world, fleeting and unreal, while the real world of ideas,\r\n\t far more powerful and permanent than your own, was right there all along, hovering above you.', 'background: #222; color: #bada55'); break;
+    case 9 : console.log('%c\t You turn to the world above you, and contemplate its majesty.', 'background: #222; color: #bada55'); break;
+    case 10 : break; //pause for a beat.
+    case 11 : {document.body.style.background = "#FF00FF";
+              var message = "";
+              if (movecount < 20) {
+                message = " (with only a little bit of cheating, very clever, how did you do that?)";
+              }
+              document.body.innerHTML = '<div class="win">You won in ' + movecount + ' moves.' + message + '</div><p><code>[reset]</code> to play again.</p>';
+              } break;
+  }
+  if (n < 11) {
+    setTimeout(function(){ win(n+1); }, 2000);        
+  }
+  if (n==0) {
+    return "You stand back";
+  }
+}
+function Fight(){
+ tell("You punch wildly at the air. Exhausted, you sit down.");
+}
+function Speak(){
+ tell("You talk. Nobody listens.");
+}
+function Inventory() {
+  cj(playerInventory);
+}
+function Me() {
+  cj(playerState);
+}
+//Note, ensure each map has a border of dots (this makes game logic simpler)
+var maps = [[   
+"...................", //0 (Starting map!)
+".....ffffffff..f...", //1
+"...ffffffffffffff..", //2
+"...f.ffffFffffEf...", //3
+"...W.....P..fffff..", //4
+".......CPTPH.......", //5
+".........P.........", //6
+".........V.........", //7
+"...................", //8
+"...................", //9
+"..................."], //10
+[
+".......", //0 (House map!)
+"..k.r..", //1
+".bhhhy.", //2
+"..a....", //3
+"......."], //4
+[
+".......", //0 (Cave!)
+"..3.2..", //1
+".4100..", //2
+"......."]] //3
+
+function move(x,y) {
+ if ((here[0] + x < 0)||(here[0] + x > maps[mapnum][0].length)) return tell("the edge of the world has been reached.");
+ if ((here[1] + y < 0)||(here[1] + y > maps[mapnum].length)) return tell("the edge of the world has been reached.");
+ if (maps[mapnum][here[1]+y][here[0]+x] == ".") return tell("the way is blocked");
+ movecount++;
+ here[0]+=x;
+ here[1]+=y;
+ return say(); 
+}
+function elfhut() {
+  tell("A clearing in the forest, with an abandoned elf hut.");
+  if (amulet == true) {
+    tell("An amulet lies on the floor.");
+  }
+}
+function horde() {
+  if (gold == true) {
+    tell("There is a horde of treasure. Gold coins, goblets, trinkets.");
+  } else {
+    tell("An empty cavern.")
+  }
+}
+function stepTell(stepMs, lines) {
+  var lineIndex = 0
+  ,   stepId = setInterval(function() {
+    var line = lines[lineIndex];
+    if (typeof line=='function') line = line();
+    if (line !== null) c('\t'+line.replace(/^\t+/,''));
+    lineIndex++;
+    if (lineIndex == lines.length) clearInterval(stepId);
+  }, stepMs); 
+}
+function act(stepMs,lines) {
+  busy = 'yes';
+  lines.push(function() { 
+    busy = false; 
+    return null;
+  });
+  stepTell(stepMs,lines);
+}
+function die(stepMs,lines) {
+  busy = 'dead';
+  lines.push(function() {
+    console.error("\r\n\t G A M E  O V E R \r\n\t");
+    init(); 
+    say();
+    return speakTellings();
+  });
+  stepTell(stepMs,lines);
+}
+
+function repeat(str,num) {
+  return new Array(num+1).join(str);
+}
+function say() {
+  var cell = maps[mapnum][here[1]][here[0]];
+  switch(cell) {
+    case "T" : return tell("You are in a town square. Paths lead to the " + Possibilities() + ".");
+    case "P" : return tell("You walk carefully along the path. You can move " + Possibilities() + ".");
+    case "H" : return tell("There is a house.");
+    case "F" : return tell("A spooky forest. You can proceed " + Possibilities() + ".");
+    case "f" : return tell("The forest is so thick, you don't know what directions are possible.");
+    case "E" : return elfhut();
+    case "W" : return tell("A stream with a waterfall blocks your way. It is teeming with fish.");
+    case "C" : return tell("You are standing on a cliff by the sea. Seagulls are squawking.");
+    case "V" : return tell("The entrance to a cave. Chills run up and down your spine.");
+    case "k" : return tell("You are in a kitchen. You can move " + Possibilities() + ".");
+    case "h" : return tell("You are in a hallway. You can move " + Possibilities() + ".");
+    case "r" : return tell("You are in a bedroom. You can move " + Possibilities() + ".");
+    case "b" : return tell("You are in a bathroom. You can move " + Possibilities() + ".");
+    case "y" : return tell("You are in a foyer. You can move " + Possibilities() + ".");
+    case "a" : return tell("Stairs lead up to an attic. You can move [Up], " + Possibilities() + ".");
+    case "0" : return tell("You are in a deep dark tunnel. Feeling with your fingers you find you can move " + Possibilities() + ".");
+    case "1" : return tell("Somehow it is even darker here. You feel yourself going cray cray."),tell("The one thing you still have is your sense of direction. You can move " + Possibilities() + ".");
+    case "2" : return tell("You are in a wide open cavern. Bones litter the floor. You can move " + Possibilities() + ".");
+    case "3" : return horde();
+    case "4" : return die(250,'You fall forever.'.split("").map(function(s,i){return repeat(' ',i)+s;})), tell("A bottomless pit.");
+    default  : return tell("You are in a place i do not recognize.");
+  }
+}
+
+function Up() { 
+  var cell = maps[mapnum][here[1]][here[0]];
+  if (cell == 'a') {
+    die(1000,['There is a creaking noise.','The stairs collapse.','The entire house falls on top of you.']);
+    return tell("You begin to climb the stairs.");
+ } else  if (mapnum ==2 && cell == '2') {
+    mapnum = 0;
+    here = [9,7];
+    tell("Slowly you climb the rope. It creaks and threatens to snap. Eventually you've hauled yourself to the surface.");
+    tell("Stepping around a large boulder you find...");
+    return say();
+ } else return tell("You cannot do that here.");
+}
+
+function Enter() {
+ var cell = maps[mapnum][here[1]][here[0]];
+ 
+  switch(cell) {
+    case "H" : {
+			mapnum = 1;
+			tell("You push the door open and step inside.");
+			here = [5,2];
+			return say();
+		}
+    case "V" : {
+			mapnum = 2;
+			tell("You walk slowly inside... you fall a short distance, it is too far to climb back up.");
+      tell("It is pitch black. You are likely to be eaten by a grue.");
+			here = [4,2];
+			return say();
+		}
+    default : return tell("That is not possible here.");
+  }
+  return "";
+}
+
+function Possibilities() {
+  var poss = [];
+  if (maps[mapnum][here[1]-1][here[0]] != ".") poss[poss.length] = "[North]";
+  if (maps[mapnum][here[1]+1][here[0]] != ".") poss[poss.length] = "[South]";
+  if (maps[mapnum][here[1]][here[0]+1] != ".") poss[poss.length] = "[East]";
+  if (maps[mapnum][here[1]][here[0]-1] != ".") poss[poss.length] = "[West]";
+  return replaceLast(poss.join(", "), ", ", " and "); //sometimes ' or ' would be better... ah well.
+}
+function North() {
+  return move(0, -1);
+}
+
+function South() {
+ return move(0, 1);
+}
+
+function West() {
+  return move(-1, 0);
+}
+
+function East() {
+  return move(1, 0);
+}
+
+function c(s) {
+ console.log(s);
+}
+function cj(o) {
+  tell(JSON.stringify(o, null, "\t").replace(/"|\{(\r\n|\r|\n)\t|\}/g, ''));
+}
+
+function replaceLast(x, what, replacement) {
+    return x.split("").reverse().join("").replace(new RegExp(what.split("").reverse().join("")), replacement.split("").reverse().join("")).split("").reverse().join("");
+};
+start();
+
+/***/ })(window); /** IIFE end*****************************************************************************************************/
+
+</script>
+<style>
+.hidden { color:white}
+.hidden:hover {
+color:black;
+}
+.win {
+ font-size:72px;
+ -webkit-animation: color_change 2s infinite alternate;
+ -moz-animation: color_change 2s infinite alternate;
+ -ms-animation: color_change 2s infinite alternate;
+ -o-animation: color_change 2s infinite alternate;
+ animation: color_change 2s infinite alternate;
+}
+
+@-webkit-keyframes color_change {
+ from { color: blue; text-shadow:0 0 10px #FF0;}
+ to { color: #FF00FF; }
+}
+@-moz-keyframes color_change {
+ from { color: blue; text-shadow:0 0 10px #FF0; }
+ to { color: #FF00FF; }
+}
+@-ms-keyframes color_change {
+ from { color: blue; text-shadow:0 0 10px #FF0; }
+ to { color: #FF00FF; }
+}
+@-o-keyframes color_change {
+ from { color: blue; text-shadow:0 0 10px #FF0; }
+ to { color: #FF00FF; }
+}
+@keyframes color_change {
+ from { color: blue; text-shadow:0 0 10px #FF0; }
+ to { color: #FF00FF; }
+}
+</style>
+<body>
+<a href="https://github.com/secretGeek/console-adventure"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+<p>This website best viewed with F12 | Console.</p>
+<p class='hidden'>Seriously, press F12 to bring up the developer tools. And then go to the <code>Console.</code> A message awaits.</p>
+</body>
+</html>
