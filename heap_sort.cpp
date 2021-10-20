@@ -1,5 +1,18 @@
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+
 #include <bits/stdc++.h>
-using namespace std;
+
 
 void buildHeap(int[], int);
 void heapify(int[], int, int);
@@ -69,4 +82,5 @@ int main()
     cout << "Sorted array is : ";
     print(a, n);
     return 0;
+
 }
