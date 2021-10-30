@@ -1,0 +1,19 @@
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int main()
+ 
+{
+    short int M, N;
+    cin >> M >> N;
+    short int Pro = M * N;
+    if (Pro % 2 != 0)
+    {
+       cout << (Pro - (Pro % 2)) / 2;
+    }
+    else
+    {
+        cout << Pro / 2;
+    }
+    return 0;
+}
