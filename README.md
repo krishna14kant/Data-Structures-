@@ -1,4 +1,10 @@
 # Data-Structures-
+<div align="center">
+ <a href="https://github.com/krishna14kant/Data-Structures-"><img src="https://img.shields.io/github/contributors/krishna14kant/Data-Structures-?style=plastic">
+ </a>
+ <a href="https://github.com/krishna14kant/Data-Structures-"><img src="https://img.shields.io/github/repo-size/krishna14kant/Data-Structures-?style=plastic">
+ </a>
+</div>
 * what is meant by data structures?
  1. data structure is a data organization, management, and storage format that enables efficient access and modification.
  2.  precisely, a data structure is a collection of data values, the relationships among them, and the functions or operations that can be applied to the data.
