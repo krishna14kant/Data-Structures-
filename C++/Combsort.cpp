@@ -56,7 +56,7 @@ int main()
 	cout << "***Combsort Algorithm***" <<endl <<endl;
 
 	//Print presorted data items
-	cout << "Pre-Sorted Data Set: "<<endl;
+	cout << "Pre Sorted Data Set: "<<endl;
 	for ( int i = 0; i < 5; i++ )
 		cout << data[i] << " ";
 	cout << endl;
