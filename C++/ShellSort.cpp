@@ -33,7 +33,7 @@ int t=x;
   y=t;
 }
 void shellsort(int a[], int n){
-  int gap =n/2;
+  float gap =n/2.0;
   while (gap > 0){
   	for (int i=gap;i<=n;i++)
   	{
