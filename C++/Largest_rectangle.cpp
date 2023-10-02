@@ -20,6 +20,7 @@ int getMaxArea(int hist[], int n)
 	// Run through all bars of given histogram
 	int i = 0;
 	while (i < n)
+		// why not you use n=<1
 	{
 		// If this bar is higher than the bar on top
 		// stack, push it to stack
