@@ -1,0 +1,134 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+class node{
+    public:
+    int data;
+    node* left;
+    node* right;
+
+    node(int d){
+        this->data=d;
+        this->left=NULL;
+        this->right=NULL;
+    }
+};
+node* insertIntoBST(node* root,int d){
+    if(root==NULL){
+        root=new node(d);
+        return root;
+    }
+    if(d>root->data){
+        root->right=insertIntoBST(root->right,d);
+    }
+    else{
+        root->left=insertIntoBST(root->left,d);
+    }
+    return root;
+}
+void takeInput(node* &root){
+    int data;
+    cin>>data;
+    while(data!=-1){
+        root = insertIntoBST(root,data);
+        cin>>data;
+    }
+}
+void levelorder(node* root){
+    queue<node*>q;
+    q.push(root);
+    q.push(NULL);
+
+    while(!q.empty()){
+        node* temp=q.front();
+        q.pop();
+
+        if(temp==NULL){
+            cout<<endl;
+            if(!q.empty()){
+                q.push(NULL);
+            }
+        }
+        else{
+            cout<<temp->data<<" ";
+            if(temp->left){
+                q.push(temp->left);
+            }
+            if(temp->right){
+                q.push(temp->right);
+            }
+        }
+    }
+}
+bool searchInBST(node* root,int x){
+    if(root==NULL){
+        return false;
+    }
+    if(root->data==x){
+        return true;
+    }
+    if(x<root->data){
+        return searchInBST(root->left,x);
+    }
+    if(x>root->data){
+        return searchInBST(root->right,x);
+    }
+}
+//iterative
+bool findinBST(node* root,int x){
+    node* temp=root;
+    while(temp!=NULL){
+        if(temp->data==x){
+            return true;
+        }
+        if(x<temp->data){
+            temp=temp->left;
+        }
+        else{
+            temp=temp->right;
+        }
+    }
+    return false;
+}
+node* minValue(node* root){
+    node* temp=root;
+    while(temp->left!=NULL){
+        temp=temp->left;
+    }
+    return temp;
+}
+node* maxValue(node* root){
+     node* temp=root;
+    while(temp->right!=NULL){
+        temp=temp->right;
+    }
+    return temp;
+}
+int main(){
+    node* root=NULL;
+    //1 3 5 6 7 9 0 -1
+    //50 20 70 10 30 90 110 -1
+    //8 3 10 1 6 14 4 7 3 -1
+    cout<<"Enter data to create bst "<<endl;
+    takeInput(root);
+
+    cout<<"Printing level order traversal of BST "<<endl;
+    levelorder(root);
+
+    cout<<"Enter the element to be searched "<<endl;
+    int x;
+    cin>>x;
+    if(searchInBST(root,x) && findinBST(root,x)){
+        cout<<"element is present"<<endl;
+    }
+    else{
+        cout<<"element is not present"<<endl;
+    }
+    node* min=minValue(root);
+    cout<<"Min node of tree "<<endl;
+    cout<<min->data<<endl;
+    node* max=maxValue(root);
+    cout<<"Max node of tree "<<endl;
+    cout<<max->data<<endl;
+    return 0;
+}
