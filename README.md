@@ -1,25 +1,47 @@
-# Data-Structures-
-* what is meant by data structures?
- 1. data structure is a data organization, management, and storage format that enables efficient access and modification.
- 2.  precisely, a data structure is a collection of data values, the relationships among them, and the functions or operations that can be applied to the data.
- # Use of data-structures?
- 1. Data structures serve as the basis for abstract data types.
- 2. Data structures provide a means to manage large amount of data efficiently for uses such as large databases and internet indexing services.
- 3.  Data structures can be used to organize the storage and retrieval of information stored in both main memory and secondary memory.
- # Types in data structure?
- 1. data structure is divided into **primitive** and**non-primitive**.
- 2. non primitive is further divided into **linear** and **non linear**.
- 3. non linear divided into **trees** and **graphs**.
- 4. linear is divided into **static** and **dynamic**.
- 5. dynamic is divided into **linked list ,stack and queue**.
- ## Steps to Contribute 📑
+# Data Structures
 
-1. You have to Fork the Repository to your profile.
-2. Create an issue mentioning what kind of changes you want to make for betterment of this repo.
-3. Once the maintainer assigns you to the issue you can commit the changes.
-4. Send the pull request mentioning all the changes you've made in detail.
+## Introduction
+Data structures are fundamental components in computer science, providing a way to organize, manage, and store data efficiently. They consist of data values, their relationships, and the operations that can be performed on the data.
 
-*All are welcomed to make changes :)*
+## Uses of Data Structures
+Data structures play a crucial role in various aspects of computing:
 
+1. **Abstract Data Types**: They serve as the foundation for abstract data types, enabling the creation of higher-level data structures with specific behaviors and characteristics.
 
-**hacktoberfest, hacktoberfest2021, hacktoberfest-accepted**
+2. **Efficient Data Management**: Data structures are essential for efficiently managing large amounts of data, as seen in applications like large databases and internet indexing services.
+
+3. **Storage and Retrieval**: Data structures help in organizing and retrieving information stored in both primary (main memory) and secondary (e.g., disk storage) memory.
+
+## Types of Data Structures
+Data structures can be classified into different categories:
+
+1. **Primitive vs. Non-Primitive**: Data structures are categorized as primitive (basic data types like integers, floats) or non-primitive (more complex structures that can hold multiple values).
+
+2. **Non-Primitive**: Non-primitive data structures are further categorized as linear and non-linear.
+
+    - **Linear Data Structures**: These include structures where elements are arranged sequentially. Examples are arrays, linked lists, stacks, and queues.
+
+    - **Non-Linear Data Structures**: These are structures where elements are connected in a more complex manner. Trees and graphs fall into this category.
+
+3. **Linear Data Structures**: Linear data structures are classified as static and dynamic.
+
+    - **Static Data Structures**: These have a fixed size, and the memory is allocated at compile-time. Arrays are a common example.
+
+    - **Dynamic Data Structures**: These have a flexible size, and memory is allocated at runtime. Examples include linked lists, stacks, and queues.
+
+## How to Contribute 📑
+If you want to contribute to this repository, please follow these steps:
+
+1. **Fork the Repository**: Create a fork of this repository in your GitHub profile.
+
+2. **Create an Issue**: Open an issue to describe the changes you'd like to make for the improvement of this repository.
+
+3. **Get Assigned**: Once the maintainer assigns you to the issue, you can start working on the changes.
+
+4. **Send a Pull Request**: After making the necessary changes, create a pull request. Be sure to provide a detailed description of the modifications you've made.
+
+**All contributors are welcome!** 🤝
+
+**Tags:** hacktoberfest, hacktoberfest-accepted
+
+---
