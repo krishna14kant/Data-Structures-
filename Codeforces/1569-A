@@ -1,0 +1,45 @@
+//Link to problem 
+//https://codeforces.com/contest/1569/problem/A
+//Solution 
+#include<iostream>
+using namespace std;
+int main(){
+    int test;
+    cin>>test;
+    while(test--){
+        int n;
+        cin>>n;
+        string str;
+        cin>>str;
+        int i;
+        int l=0;
+        int r=0;
+        int j=0;
+        while(j<n){
+            int aCount=0;
+            int bCount=0;
+        for(i=j;i<str.length();i++){
+            if(str[i]=='a'){
+                aCount++;
+            }
+            else {
+                bCount++;
+            }
+            if((aCount==bCount) and ((aCount!=0)||(bCount!=0))){
+                l=j;
+                r=i;
+                break;
+            }
+        }
+        j++;
+        }
+        if(r!=0){
+            cout<<l+1<<" "<<r+1<<endl;
+        }
+        else {
+            cout<<"-1 -1"<<endl;
+        }
+        
+    }
+    return 0;
+}
